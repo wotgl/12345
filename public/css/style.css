@@ -1,0 +1,20 @@
+body{
+    background: steelblue;
+}
+
+#canvas-container {
+    position: relative;
+}
+#canvasBg {
+    float:left;
+    position: absolute;
+    width: 300px;
+    height: 150px;
+}
+
+#canvasPlayer {
+    float:left;
+    position: absolute;
+    width: 300px;
+    height: 150px;
+}

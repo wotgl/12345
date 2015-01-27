@@ -1,0 +1,9 @@
+{
+  "name": "mylittlegame",
+  "version": "0.0.1",
+  "description": "mylittlegame",
+  "dependencies": {
+    "express": "~4.10.2",
+    "socket.io": "~1.3.2"
+  }
+}
