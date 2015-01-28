@@ -14,3 +14,8 @@ or [click](http://127.0.0.1:8080)
 
 
 PROFIT!
+
+
+requirements:
+* nodejs
+* npm
