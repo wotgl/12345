@@ -9,16 +9,13 @@ var socket = io(),
 
 
 var players = [];
-var counter = 0;
+var totalPlayers;
+var myPlayer;
 
-
-
-
-
+window.onload = init;
 
 function init() {
     onConnected();
-    //checkPlayers();
 
     canvasBg = document.getElementById("canvasBg");
     canvasPlayer = document.getElementById("canvasPlayer");
@@ -28,52 +25,101 @@ function init() {
 
 
 
+    socket.emit('dataPlayerRequest');
+    socket.on('dataPlayersResponse', dataPlayersResponse);
+    socket.emit('newPlayer');
+    socket.on('newPlayerResponse', newPlayerResponse);
+    socket.on('addNewPlayer', addNewPlayer);
+
+
+
+
     ctxBg.fillStyle = '#78BD4C';
     ctxBg.fillRect(0, 0, canvasBg.width, canvasBg.height);
 
 
-
-    x = Math.random() * 100;
-    y = Math.random() * 100;
-    var player = new Player(x, y, ctxPlayer);
-    player.draw();
-    socket.emit('newPlayer', {srcX: x, srcY: y});
-
-
-
-    //listen new players
-    socket.on('newEmit', function(msg){
-        console.log("add new player " + msg['srcX'] + msg['srcY']);
-        counter++;
-        players[counter] = new Player(msg['srcX'], msg['srcY'], ctxPlayer);
-        players[counter].draw();
-    })
-
-
-
 };
 
+
+
+//======================================Socket=============================
 function onConnected() {
     socket.connect();
-    socket.on('connected', function(msg){
-        console.log(msg['message']);
+    socket.on('connected', function(data){
+        console.log(data);
     });
 };
 
-function checkPlayers(){
-    socket.on('checkPlayers', function(msg){
 
-    })
+function dataPlayersResponse(data){
+    totalPlayers = data.totalPlayers;
+    console.log("totalPlayers without me = " + totalPlayers);
+
+    for (var i = 1; i <= totalPlayers; i++){
+        //players[i] = data.players[i];
+        players[i] = new Player(data.players[i].id, data.players[i].name, data.players[i].srcX, data.players[i].srcY,
+            data.players[i].height, data.players[i].width, ctxPlayer);
+    }
+
+    allPlayersDraw();
 }
 
 
-function Player(x, y, ctx){
-    this.srcX = x;
-    this.srcY = y;
-    this.height = 25;
-    this.width = 25;
+function newPlayerResponse(data){
+    totalPlayers = data.totalPlayers;
+    myPlayer = new Player(data.player.id, data.player.name, data.player.srcX, data.player.srcY,
+        data.player.height, data.player.width, ctxPlayer);
+    myPlayer.draw();
+}
 
-    this.ctx = ctx;
+
+function addNewPlayer(data){
+    totalPlayers = data.totalPlayers;
+    console.log("addNewPlayer -> totalPlayers = " + totalPlayers);
+
+    players[totalPlayers] = new Player(data.player.id, data.player.name, data.player.srcX, data.player.srcY,
+        data.player.height, data.player.width, ctxPlayer);
+    players[totalPlayers].draw();
+}
+
+
+
+
+
+
+
+
+
+
+
+//===================================draw================================
+function allPlayersDraw(newCTX){
+    clearCtx(ctxPlayer);
+    for (var i = 1; i <= totalPlayers; i++){
+        players[i].draw();
+    }
+}
+
+
+
+function clearCtx(newCTX){
+    newCTX.clearRect(0, 0, newCTX.height, newCTX.width);
+}
+
+
+
+
+
+//==============================Player=====================================
+function Player(newID, newName, newX, newY, newHeight, newWidth, newCTX){
+    this.id = newID;
+    this.name = newName;
+    this.srcX = newX;
+    this.srcY = newY;
+    this.height = newHeight;
+    this.width = newWidth;
+
+    this.ctx = newCTX;
     this.color = 'red';
 }
 
@@ -83,7 +129,21 @@ Player.prototype.draw = function(){
 };
 
 
-window.onload = init;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
